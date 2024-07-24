@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/opencommerce-dashboard/static/css/main.1f16730e.css",
+    "main.js": "/opencommerce-dashboard/static/js/main.6137178b.js",
+    "static/js/453.7f079eda.chunk.js": "/opencommerce-dashboard/static/js/453.7f079eda.chunk.js",
+    "index.html": "/opencommerce-dashboard/index.html",
+    "main.1f16730e.css.map": "/opencommerce-dashboard/static/css/main.1f16730e.css.map",
+    "main.6137178b.js.map": "/opencommerce-dashboard/static/js/main.6137178b.js.map",
+    "453.7f079eda.chunk.js.map": "/opencommerce-dashboard/static/js/453.7f079eda.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1f16730e.css",
+    "static/js/main.6137178b.js"
+  ]
+}
