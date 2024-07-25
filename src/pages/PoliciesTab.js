@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -22,6 +22,8 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  Spinner,
+  Center,
 } from "@chakra-ui/react";
 
 // Dummy product list - replace this with actual product data in a real application
@@ -33,6 +35,7 @@ const products = [
 
 function PoliciesTab() {
   const [policies, setPolicies] = useState([]);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [newPolicy, setNewPolicy] = useState({
     type: 'product',
     detail: {
@@ -53,6 +56,12 @@ function PoliciesTab() {
   });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editingPolicy, setEditingPolicy] = useState(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1500); // Simulating a 1.5-second loading time
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -121,27 +130,33 @@ function PoliciesTab() {
         <Button colorScheme="blue" onClick={() => { setEditingPolicy(null); onOpen(); }}>Add Policy</Button>
       </HStack>
 
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Type</Th>
-            <Th>Details</Th>
-            <Th>Actions</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {policies.map(policy => (
-            <Tr key={policy.id}>
-              <Td>{policy.type}</Td>
-              <Td>{JSON.stringify(policy.detail)}</Td>
-              <Td>
-                <Button size="sm" colorScheme="yellow" mr={2} onClick={() => handleEdit(policy)}>Edit</Button>
-                <Button size="sm" colorScheme="red" onClick={() => handleDelete(policy.id)}>Delete</Button>
-              </Td>
+      {isPageLoading ? (
+        <Center h="200px">
+          <Spinner size="xl" color="blue.500" />
+        </Center>
+      ) : (
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Type</Th>
+              <Th>Details</Th>
+              <Th>Actions</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {policies.map(policy => (
+              <Tr key={policy.id}>
+                <Td>{policy.type}</Td>
+                <Td>{JSON.stringify(policy.detail)}</Td>
+                <Td>
+                  <Button size="sm" colorScheme="yellow" mr={2} onClick={() => handleEdit(policy)}>Edit</Button>
+                  <Button size="sm" colorScheme="red" onClick={() => handleDelete(policy.id)}>Delete</Button>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      )}
 
       <Modal isOpen={isOpen} onClose={onClose} size="xl">
         <ModalOverlay />

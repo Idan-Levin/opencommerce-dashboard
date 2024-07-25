@@ -28,7 +28,8 @@ import {
 
 function ProductsTab() {
   const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [newProduct, setNewProduct] = useState({
     name: '',
     description: '',
@@ -44,15 +45,12 @@ function ProductsTab() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
-    // Simulating API call when component mounts
+    // Simulating an API call or data fetching
     setTimeout(() => {
-      const mockProducts = [
-        { id: 1, name: 'Product A', description: 'Description A', type: 'digital', price: '10', currency: 'ETH', chain: 'Ethereum' },
-        { id: 2, name: 'Product B', description: 'Description B', type: 'physical', price: '20', currency: 'USDC', chain: 'Polygon' },
-      ];
-      setProducts(mockProducts);
-      setIsLoading(false);
-    }, 1500);
+      // Here you would typically fetch your products data
+      // For now, we'll just set the loading to false
+      setIsPageLoading(false);
+    }, 1500); // Simulating a 1.5-second loading time
   }, []);
 
   const handleInputChange = (e) => {
@@ -62,7 +60,12 @@ function ProductsTab() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setProducts(prev => [...prev, { ...newProduct, id: Date.now() }]);
+    if (editingProduct) {
+      setProducts(prev => prev.map(p => p.id === editingProduct.id ? { ...newProduct, id: p.id } : p));
+      setEditingProduct(null);
+    } else {
+      setProducts(prev => [...prev, { ...newProduct, id: Date.now() }]);
+    }
     setNewProduct({
       name: '',
       description: '',
@@ -78,51 +81,63 @@ function ProductsTab() {
     onClose();
   };
 
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setNewProduct(product);
+    onOpen();
+  };
+
+  const handleDelete = (id) => {
+    setProducts(prev => prev.filter(p => p.id !== id));
+  };
+
+
   return (
     <Box p={5}>
       <HStack justify="space-between" mb={5}>
         <Heading>Products</Heading>
-        <Button colorScheme="purple" onClick={onOpen}>Add Product</Button>
+        <Button colorScheme="purple" onClick={() => { setEditingProduct(null); onOpen(); }}>Add Product</Button>
       </HStack>
 
-      {isLoading ? (
-        <Center h="200px">
-          <Spinner size="xl" color="purple.500" />
-        </Center>
-      ) : (
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Name</Th>
-              <Th>Description</Th>
-              <Th>Type</Th>
-              <Th>Price</Th>
-              <Th>Chain</Th>
-              <Th>Actions</Th>
+      {isPageLoading ? (
+      <Center h="200px">
+        <Spinner size="xl" color="purple.500" />
+      </Center>
+    ) : (
+
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Name</Th>
+            <Th>Description</Th>
+            <Th>Type</Th>
+            <Th>Price</Th>
+            <Th>Chain</Th>
+            <Th>Actions</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {products.map(product => (
+            <Tr key={product.id}>
+              <Td>{product.name}</Td>
+              <Td>{product.description}</Td>
+              <Td>{product.type}</Td>
+              <Td>{`${product.price} ${product.currency}`}</Td>
+              <Td>{product.chain}</Td>
+              <Td>
+                <Button size="sm" colorScheme="yellow" mr={2} onClick={() => handleEdit(product)}>Edit</Button>
+                <Button size="sm" colorScheme="red" onClick={() => handleDelete(product.id)}>Delete</Button>
+              </Td>
             </Tr>
-          </Thead>
-          <Tbody>
-            {products.map(product => (
-              <Tr key={product.id}>
-                <Td>{product.name}</Td>
-                <Td>{product.description}</Td>
-                <Td>{product.type}</Td>
-                <Td>{`${product.price} ${product.currency}`}</Td>
-                <Td>{product.chain}</Td>
-                <Td>
-                  <Button size="sm" colorScheme="yellow" mr={2}>Edit</Button>
-                  <Button size="sm" colorScheme="red">Delete</Button>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      )}
+          ))}
+        </Tbody>
+      </Table>
+       )}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add New Product</ModalHeader>
+          <ModalHeader>{editingProduct ? 'Edit Product' : 'Add New Product'}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <VStack spacing={4} align="stretch">
@@ -206,7 +221,7 @@ function ProductsTab() {
 
           <ModalFooter>
             <Button colorScheme="purple" mr={3} onClick={handleSubmit}>
-              Save
+              {editingProduct ? 'Update' : 'Save'}
             </Button>
             <Button variant="ghost" onClick={onClose}>Cancel</Button>
           </ModalFooter>
